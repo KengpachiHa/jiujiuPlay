@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" >
+    <style>
+        body {
+            /* background-color: bl */
+            margin: 0;
+            height: 100%;
+        }
+        canvas {
+            background-color: black;
+            display: block;
+        }
+    </style>
+    <title>jiujiuPlay</title>
+</head>
+<body>
+   <canvas id="cvs"></canvas>
+<script>
+
+const cvs = document.getElementById('cvs')
+const ctx = cvs.getContext('2d');
+const screenWidth = document.body.clientWidth
+const screenHeitht = window.innerHeight
+const speed = random(2, 4)
+
+cvs.width = screenWidth
+cvs.height = screenHeitht
+
+class Ball {
+    constructor() {
+        this.r = random(30, 50)
+        this.x = random(0 + this.r, screenWidth - this.r)
+        this.y = random(0 + this.r, screenHeitht - this.r)
+        this.xDir = Math.random() < 0.5 ? -1 : 1
+        this.yDir = Math.random() < 0.5 ? -1 : 1
+        this.color = Math.random() < 0.5 ? 'yellow' : '#34afff'
+    }
+
+    move() {
+        if(this.x + this.r >= screenWidth || this.x - this.r <= 0) {
+            this.xDir = this.xDir * (-1)
+        }
+
+        if(this.y + this.r >= screenHeitht || this.y - this.r <= 0) {
+            this.yDir = this.yDir * (-1)
+        }
+
+        this.x += this.xDir * speed
+        this.y += this.yDir * speed
+    }
+}
+
+let b = creatBall()
+let main = null
+
+const run = function () {
+    ctx.clearRect(0, 0, screenWidth, screenHeitht)
+    b.move()
+    draw(b)
+    main = setTimeout(() => {
+        run()
+        
+    }, 1000 / 60);
+}
+
+run()
+
+cvs.addEventListener('click', (e) => {
+    const rect = cvs.getBoundingClientRect()
+    const x = e.clientX - rect.left * (cvs.width / rect.width)
+    const y = e.clientY - rect.top * (cvs.height / rect.height)
+
+    clearTimeout(main)
+
+    // draw({
+    //     x, y, r: 10
+    // })
+
+    if(Math.pow((x - b.x), 2) + Math.pow((y - b.y), 2) <= Math.pow(b.r + 20, 2)) {
+        ctx.clearRect(0, 0, screenWidth, screenHeitht)
+        
+        b = creatBall()
+    }
+    
+    main = setTimeout(() => {
+        run()
+    }, 1000 / 60);
+    
+});
+
+function creatBall() {
+    return new Ball
+}
+
+function draw(ball) {
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, 2 * Math.PI, true)
+    ctx.fillStyle = ball.color
+    ctx.stroke()
+    ctx.fill()
+} 
+
+function random(min, max) {
+    return Math.round(Math.random() * (max - min)) + min;
+}
+</script>
+    
+</body>
+</html>
